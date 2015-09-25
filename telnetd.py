@@ -3,26 +3,40 @@ import logging
 import random
 
 class Telnetd(protocol.Protocol):
-    logging.basicConfig(filename='telnetd_honeypot.log',level=logging.DEBUG,format='%(asctime)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+    logging.basicConfig(filename='telnetd_honeypot.log',level=logging.DEBUG,format='%(message)s')
     PROMPT = "/ # "
+    BANNER = "\n\nBusyBox v1.15.3 (2013-04-03 20:26:55 CST) built-in shell (ash)\nEnter 'help' for a list of built-in commands.\n\n/ # "
     def dataReceived(self, data):
         data = data.strip()
         if data == "id":
             self.transport.write("uid=0(root) gid=0(root) groups=0(root)\n")
-        elif data.split(" ")[0] == "uname":
-            self.transport.write("Linux f001 3.13.3-7-high-octane-fueled #3000-LPG SMPx4 Fri Jun 31 25:24:23 UTC 2200 x86_64 x64_86 x13_37 GNU/Linux\n") 
+        elif data == "/bin/busybox ZORRO":
+            self.transport.write("ZORRO: applet not found\n")
+        elif data.split(" ")[0] == "echo":
+            self.transport.write(data.split(" ")[1] + "\n")
+        elif data == "uname -a":
+            self.transport.write("Linux DreamBox 2.6.32.59 #2 Mon Jul 2 18:37:44 CST 2012 mips GNU/Linux\n")
+        elif data == "uname":
+            self.transport.write("Linux\n")
+        elif data == "uname -r":
+            self.transport.write("2.6.32.59\n")
+        elif data == "exit":
+            self.transport.loseConnection()
+        elif data.split(" ")[0] == "ls":
+			self.transport.write("bin    etc    media  proc   sys    usr    www\ndev    lib    mnt    sbin   tmp    var\n")
         else:
-            if random.randrange(0, 2) == 0 and data != "":
-                self.transport.write("bash: " +  data.split(" ")[0] + ": command not found\n")
+            if data != "":
+                self.transport.write("/bin/sh: " +  data.split(" ")[0] + ": command not found\n")
 
         self.transport.write(Telnetd.PROMPT)
 
         if data != "":
-            logging.info(self.transport.getPeer().host + " " + data)
+           logging.info(data)
+
+
 
     def connectionMade(self):
-        self.transport.write(Telnetd.PROMPT)
-
+        self.transport.write(Telnetd.BANNER)
 class TelnetdFactory(protocol.Factory):
     def buildProtocol(self, addr):
         return Telnetd()
