@@ -10,8 +10,10 @@ class Telnetd(protocol.Protocol):
         data = data.strip()
         if data == "id":
             self.transport.write("uid=0(root) gid=0(root) groups=0(root)\n")
-        elif data == "/bin/busybox ZORRO":
-            self.transport.write("ZORRO: applet not found\n")
+        elif data.split(" ")[0] == "wget":
+            self.transport.write("wget: missing URL\nUsage: wget [OPTION]... [URL]...\nTry `wget --help' for more options.\n")
+        elif data.split(" ")[0] == "/bin/busybox":
+            self.transport.write(data.split(" ")[1] + " applet not found\n")
         elif data.split(" ")[0] == "echo":
             self.transport.write(data.split(" ")[1] + "\n")
         elif data == "uname -a":
@@ -23,7 +25,7 @@ class Telnetd(protocol.Protocol):
         elif data == "exit":
             self.transport.loseConnection()
         elif data.split(" ")[0] == "ls":
-			self.transport.write("bin    etc    media  proc   sys    usr    www\ndev    lib    mnt    sbin   tmp    var\n")
+             elf.transport.write("bin    etc    media  proc   sys    usr    www\ndev    lib    mnt    sbin   tmp    var\n")
         else:
             if data != "":
                 self.transport.write("/bin/sh: " +  data.split(" ")[0] + ": command not found\n")
