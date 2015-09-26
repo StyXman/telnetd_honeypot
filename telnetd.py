@@ -25,7 +25,7 @@ class Telnetd(protocol.Protocol):
         elif data == "exit":
             self.transport.loseConnection()
         elif data.split(" ")[0] == "ls":
-             elf.transport.write("bin    etc    media  proc   sys    usr    www\ndev    lib    mnt    sbin   tmp    var\n")
+            self.transport.write("bin    etc    media  proc   sys    usr    www\ndev    lib    mnt    sbin   tmp    var\n")
         else:
             if data != "":
                 self.transport.write("/bin/sh: " +  data.split(" ")[0] + ": command not found\n")
