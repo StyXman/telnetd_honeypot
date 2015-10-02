@@ -26,7 +26,6 @@ class Telnetd(protocol.Protocol):
             self.transport.loseConnection()
         elif data.split(" ")[0] == "ls":
             self.transport.write("bin    etc    media  proc   sys    usr    www\ndev    lib    mnt    sbin   tmp    var\n")
-        else:
 
         self.transport.write(Telnetd.PROMPT)
 
