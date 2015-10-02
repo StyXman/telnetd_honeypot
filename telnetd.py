@@ -27,8 +27,6 @@ class Telnetd(protocol.Protocol):
         elif data.split(" ")[0] == "ls":
             self.transport.write("bin    etc    media  proc   sys    usr    www\ndev    lib    mnt    sbin   tmp    var\n")
         else:
-            if data != "":
-                self.transport.write("/bin/sh: " +  data.split(" ")[0] + ": command not found\n")
 
         self.transport.write(Telnetd.PROMPT)
 
